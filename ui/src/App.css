@@ -1,0 +1,80 @@
+.app {
+    display: flex;
+    flex-direction: row;
+    padding: 50px;
+}
+
+.wallet {
+    border-color: #373b41;
+    border-style: solid;
+    border-width: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    background-color: #373b41;
+    height: 300px;
+    width: 200px;
+}
+
+.wallet > .header {
+    width: 100%;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    font-weight: 400;
+    font-size: 25px;
+}
+
+.wallet > .balance {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.wallet > .balance > .amount {
+    font-size: 40px;
+    color: #81a2be;
+}
+
+.wallet > .balance > .amount {
+    text-align: end;
+}
+
+.wallet > .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    padding-bottom: 20px;
+}
+
+.footer > .footer-actions {
+    display: flex;
+    width: 70%;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.transaction {
+    width: 60px;
+}
+
+.transaction > button {
+    border: none;
+    height: 30px;
+    width: 100%;
+    padding: 0px;
+}
+
+.transaction > button:hover {
+    cursor: pointer;
+}
+
+.transaction > button.buy {
+    background-color: #81a2be;
+}
+
+.transaction > button.sell {
+    background-color: #f0c674;
+}
