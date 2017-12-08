@@ -24,4 +24,8 @@ pid=$(docker run --rm -e POSTGRES_PASSWORD=supersecret -e POSTGRES_USER=docker -
 
 Now if you run another postgres container and use the same `-v` argument, your data will persist.
 
+## Takeaways
+- Use data volumes to handle persistent state.
+- Use `docker volume create <volume name>` to create a data volume.
+
 Previous: [cowserve 2.0](https://github.com/jenterkin/docker-microservice-example/tree/04-cowserve-2.0) | Next: [Docker Compose](https://github.com/jenterkin/docker-microservice-example/tree/06-docker-compose)
