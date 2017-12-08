@@ -1,4 +1,4 @@
-Previous: [What is Docker?](https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker) | Next: [Open a Shell in a Container](https://github.com/jenterkin/docker-microservice-example/tree/03-open-a-shell-in-a-container)
+Previous: [What is Docker?](https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker) | Next: [Docker Images](https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images)
 # Running a Docker Container
 ## Installation
 If you have not yet installed Docker, do so now.
@@ -37,4 +37,13 @@ When you run this command, Docker is going to see if you already have the image 
 - Containers are instances of container images.
 - The container will stop when the main process ends.
 
-Previous: [What is Docker?](https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker) | Next: [Open a Shell in a Container](https://github.com/jenterkin/docker-microservice-example/tree/03-open-a-shell-in-a-container)
+## Open a Shell in a Container
+Sometimes you will want to try something in a container before putting it into a `Dockerfile`. You can do this by using the `i` and `t` options. These options give you an interactive shell. Try running the following and play around with it
+```bash
+docker run --rm -it alpine:latest sh
+```
+
+### Takeaways
+- Pass `-it` to `docker run` to run the command in an interactive terminal.
+
+Previous: [What is Docker?](https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker) | Next: [Docker Images](https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images)
