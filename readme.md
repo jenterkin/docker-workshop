@@ -4,7 +4,7 @@ Docker images are essentially snapshots of a container. When we ran the commands
 
 ## Create a Dockerfile
 Let's make a webserver that servs a file with a talking cow in it. In some directory make a `Dockerfile` called... `Dockerfile`. And put the following in it:
-```docker
+```Dockerfile
 FROM python:3.6
 
 RUN apt-get -y update && \
@@ -20,12 +20,12 @@ CMD python -m http.server
 ```
 
 Let's step through this file.
-```docker
+```Dockerfile
 FROM python:3.6
 ```
 The `FROM` instruction indicates that we are basing our image off of another image. We're going to base our image off of the official Python 3.6 image so we can use the `http` module to serve our web page.
 
-```docker
+```Dockerfile
 RUN apt-get -y update && \
     apt-get -y upgrade && \
     apt-get -y clean
@@ -36,7 +36,7 @@ RUN echo '<pre>' > index.html && \
     echo '</pre>'
 ```
 The `RUN` instruction runs a command. Here we are installing our dependencies and creating the html file.
-```docker
+```Dockerfille
 CMD python -m http.server
 ```
 The `CMD` instruction states what command is run in a container by default. This means that when we run a container based off of this image, we do not need to specify a command.
@@ -53,7 +53,7 @@ Oops. Looks like it can't find the commands we installed.
 /bin/sh: 1: cowsay: not found
 ```
 This is happening becuase the commands are not found in our path. We add that to our path. Let's add it under the `FROM` instruction and try building it again.
-```docker
+```Dockerfile
 FROM python:3.6
 
 ENV PATH=$PATH:/usr/games
