@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const API_BASE = 'http://localhost/api'
+const API_BASE = 'http://localhost:8080/api'
 const ROUTES = {
     buy: API_BASE + '/buy',
     sell: API_BASE + '/sell',

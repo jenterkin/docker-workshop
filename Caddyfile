@@ -1,6 +1,6 @@
 http://localhost {
     tls off
-    proxy / ui.webapp:3000 {
+    proxy / localhost:3000 {
         websocket
         transparent
     }
@@ -8,7 +8,7 @@ http://localhost {
 
 http://localhost/api {
     tls off
-    proxy / app.webapp:5000 {
+    proxy / localhost:5000 {
         transparent
     }
 }
