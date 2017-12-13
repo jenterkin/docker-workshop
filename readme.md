@@ -13,7 +13,7 @@ This service has four parts:
 
 All of which are all being run and managed by [Supervisor](http://supervisord.org/).
 
-The goal here is to strip out the Vagrant environment and put each of these services into their own containers, and hook them up using `docker-compose`. This excersise should put together everything you've learned here, plus a little more, all of which can be found on the [Compose File Reference](https://docs.docker.com/compose/compose-file/#service-configuration-reference).
+The goal here is to strip out the Vagrant environment and put each of these services into their own containers, and hook them up using `docker-compose`. This exercise should put together everything you've learned here, plus a little more, all of which can be found on the [Compose File Reference](https://docs.docker.com/compose/compose-file/#service-configuration-reference).
 
 A good starting point is to look at the `supervisord.conf` file to see how each service is run.
 
