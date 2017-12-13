@@ -1,4 +1,4 @@
-Previous: [Managing State in Containers](https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers)
+Previous: [Managing State in Containers](https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers) | Next: [Converting a Monolith to MIcroservices](https://github.com/jenterkin/docker-microservice-example/tree/07-monolith-to-microservices)
 
 # Docker Compose
 `docker-compose` is a great tool during development. It allows you to do some minimal orchestration and get rid of having to type out your `docker run` commands and manage the status of all of your containers for a service. Let's start off with the postgres container. Create a file called `docker-compose.yml` with the following:
@@ -47,4 +47,4 @@ Don't worry that this is being glossed over here. The next exercise includes a w
 - `docker-compose` is used for basic orchestration.
 - Data volumes can be defined in the `docker-compose.yml` file, and do not need to be created prior.
 
-Previous: [Managing State in Containers](https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers)
+Previous: [Managing State in Containers](https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers) | Next: [Converting a Monolith to MIcroservices](https://github.com/jenterkin/docker-microservice-example/tree/07-monolith-to-microservices)
