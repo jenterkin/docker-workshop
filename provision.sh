@@ -54,4 +54,4 @@ npm install -g yarn;
 cd $SRC/ui;
 yarn install;
 
-sudo -u ubuntu supervisord -c /vagrant/app.conf;
+sudo -u ubuntu supervisord -c /vagrant/supervisord.conf;
