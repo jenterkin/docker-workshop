@@ -91,6 +91,6 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
   Now we have an interactive shell in our container. We can inspect it like I did in the example above and see that it doesn't look like our host. Remember back to the first section -- containers are /isolated/ environments.
 
 ** Takeaways
-   - Pass `-it` to `docker run` to run the command in an interactive terminal.
+   - Pass ~-it~ to ~docker run~ to run the command in an interactive terminal.
 
 Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker][What is Docker?]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]]
