@@ -15,7 +15,7 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
   But before that, let's looks at the command and see what each part does:
   - ~docker~ is the command that you will use to manage containers, images, volumes, and networks.
   - ~run~ runs a container.
-  - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [[https://alpinelinux.org/][Alpine]]<sup>[1]</sup> image.
+  - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [[https://alpinelinux.org/][Alpine]]^[1] image.
   - ~echo "hello world"~ is the command we are telling Docker to run in the container.
 
   So this is going to run the command ~echo "hello, world"~ in a container based off of the Alpine image. Alpine is just a light-weight linux distribution.
