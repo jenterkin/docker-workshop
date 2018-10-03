@@ -21,14 +21,14 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
   So this is going to run the command ~echo "hello, world"~ in a container based off of the Alpine image. Alpine is just a light-weight linux distribution.
 
   You should see the following output when this is run:
-  #+BEGIN_QUOTE
+  #+BEGIN_EXAMPLE
   Unable to find image 'alpine:latest' locally
   latest: Pulling from library/alpine
   4fe2ade4980c: Already exists
   Digest: sha256:621c2f39f8133acb8e64023a94dbdf0d5ca81896102b9e57c0dc184cadaf5528
   Status: Downloaded newer image for alpine:latest
   hello, world
-  #+END_QUOTE
+  #+END_EXAMPLE
 
   Docker does a few things when you try and run a container.
   1. First it will look on your system for the image that you specified.
@@ -38,10 +38,10 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
 
 ** Deleting Containers
    Run ~docker ps -a~ and you should see something like the following:
-   #+BEGIN_QUOTE
+   #+BEGIN_EXAMPLE
    CONTAINER ID        IMAGE               COMMAND                 CREATED             STATUS                     PORTS               NAMES
    bd995289303e        alpine:latest       "echo 'hello, world'"   3 seconds ago       Exited (0) 2 seconds ago                       gracious_ritchie
-   #+END_QUOTE
+   #+END_EXAMPLE
    In the output we can see the container that we ran with ~docker run~. ~docker ps~ shows you all running containers. ~docker ps -a~ shows you all of the containers on your system, regardless of it's status.
 
    So this container is just sitting on our system taking up space. Let's delete it. First off, grab the id of the container. This is shown in the ~docker ps -a~ command we just ran, which in my case is ~bd995289303e~. Then, we just pass that in to ~docker rm~:
@@ -50,9 +50,9 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
    #+END_SRC
 
    Now if we run ~docker ps -a~ again, we should see an empty list of containers:
-   #+BEGIN_QUOTE
+   #+BEGIN_EXAMPLE
    CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
-   #+END_QUOTE
+   #+END_EXAMPLE
 
 ** Automatically Delete Containers
    We don't have to do this song-and-dance every time we want to delete a container, though. We can simply tell docker to destroy the container when it is done running by passing in ~--rm~ to our run command. Let's run the ~docker run~ command we ran before, but here we'll pass in the ~--rm~ flag.
@@ -78,7 +78,7 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
   #+END_SRC
 
   This should exit immediately and we'll still be on our host terminal. This is because Docker does not run commands in an interactive terminal by default. To do this we must provide the ~-i~ and ~-t~ options -- or ~--interactive~ and ~--tty~ respectively. Let's try it again with those options:
-  #+BEGIN_QUOTE
+  #+BEGIN_EXAMPLE
   % docker run --rm -it alpine:latest sh
   / # whoami
   root
@@ -86,7 +86,7 @@ Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-wha
   / # hostname
   068aac782f39
   / #
-  #+END_QUOTE
+  #+END_EXAMPLE
 
   Now we have an interactive shell in our container. We can inspect it like I did in the example above and see that it doesn't look like our host. Remember back to the first section -- containers are /isolated/ environments.
 
