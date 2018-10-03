@@ -1,19 +1,18 @@
 Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker][What is Docker?]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]]
 * Running a Docker Container
-** Running Your First Container
-   Run the following command in a terminal:
-   #+BEGIN_SRC bash
+  Run the following command in a terminal:
+  #+BEGIN_SRC bash
    docker run --rm alpine:latest echo "hello world"
-   #+END_SRC
-   Let's break apart this command.
+  #+END_SRC
+  Let's break apart this command.
 
-   - ~docker~ is the command that you will use to manage containers, images, volumes, and networks.
-   - ~run~ runs a container.
-   - ~--rm~ instructs Docker to destroy the container when the process finishes executing.
-   - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [Alpine](https://alpinelinux.org/)<sup>[1]</sup> image.
-   - ~echo "hello world"~ is the command we are telling Docker to run in the container.
+  - ~docker~ is the command that you will use to manage containers, images, volumes, and networks.
+  - ~run~ runs a container.
+  - ~--rm~ instructs Docker to destroy the container when the process finishes executing.
+  - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [Alpine](https://alpinelinux.org/)<sup>[1]</sup> image.
+  - ~echo "hello world"~ is the command we are telling Docker to run in the container.
 
-   When you run this command, Docker is going to see if you already have the image locally. If not, it is going to download it. Next, it is going to run the command in the container. Here you should see "hello world" printed to your screen. When the process in the container has finished, the container will exit. This is because Docker focuses on having one process run per container. When the process has ended, it assumes the container doesn't need to exist anymore and exits. You can still run multiple processes in a container, but the command you give to docker is the main process that has a `pid` of `1`.
+  When you run this command, Docker is going to see if you already have the image locally. If not, it is going to download it. Next, it is going to run the command in the container. Here you should see "hello world" printed to your screen. When the process in the container has finished, the container will exit. This is because Docker focuses on having one process run per container. When the process has ended, it assumes the container doesn't need to exist anymore and exits. You can still run multiple processes in a container, but the command you give to docker is the main process that has a `pid` of `1`.
 
 ** Footnotes
 1. Alpine is a lightweight Linux distro used commonly in Linux containers for its' small image size and focus on security.
