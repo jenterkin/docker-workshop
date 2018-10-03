@@ -1,0 +1,16 @@
+Next: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]]
+
+* What is a Container?
+  A container is an isolated environment for the purpose of running processes. These isolated environments give us much more control on how these processes are run than if we were to run those processes on our host machines. For instance, say you have two projects that depend on different versions of a package. You can create a container for each of these projects, but install the specific package version you need in each environment, without impacting the other container or your host.
+
+  Thanks to this kind of isolation, you never have to worry about conflicting dependencies, system configurations, what environment variables you have set, or if a system upgrade on your host will break anything.
+
+* What is Docker?
+  Docker is a rather opinionated set of tools that make creating, running, and managing containers much easier while providing abstractions that help you iterate faster, enabling portability for your project, and much more.
+
+* Takeaways
+- Containers are isolated environments that run on your host.
+- Docker manages containers, images, data volumes, and networks.
+- Docker is software that manages and provides an abstraction layer over containers.
+
+Next: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]]
