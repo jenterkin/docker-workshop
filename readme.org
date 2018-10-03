@@ -1,32 +1,94 @@
 Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/01-what-is-docker][What is Docker?]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]]
-* Running a Docker Container
-  Run the following command in a terminal:
-  #+BEGIN_SRC bash
-   docker run --rm alpine:latest echo "hello world"
-  #+END_SRC
-  Let's break apart this command.
 
+* Running a Docker Container
+** Docker Images
+   Before we dive in to running a container, a little bit of information on images is necessary.
+
+   As we learned in the last section, containers are environments to run processes. One convenience Docker provides are images. These are pre-made environments that come packaged with certain configurations and/or software installed. For instance, if you want to run a Python 3 process, you could create a container and install Python 3 in it, or you could use a Docker image that already has Python 3 on it. 
+
+** Running a Container
+  This is the command we're going to run:
+  #+BEGIN_SRC bash
+  docker run alpine:latest echo "hello world"
+  #+END_SRC
+
+  But before that, let's looks at the command and see what each part does:
   - ~docker~ is the command that you will use to manage containers, images, volumes, and networks.
   - ~run~ runs a container.
-  - ~--rm~ instructs Docker to destroy the container when the process finishes executing.
-  - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [Alpine](https://alpinelinux.org/)<sup>[1]</sup> image.
+  - ~alpine:latest~ is the tagged image (~image:tag~) that your container will be based off of. In this case it is the latest [[https://alpinelinux.org/][Alpine]]<sup>[1]</sup> image.
   - ~echo "hello world"~ is the command we are telling Docker to run in the container.
 
-  When you run this command, Docker is going to see if you already have the image locally. If not, it is going to download it. Next, it is going to run the command in the container. Here you should see "hello world" printed to your screen. When the process in the container has finished, the container will exit. This is because Docker focuses on having one process run per container. When the process has ended, it assumes the container doesn't need to exist anymore and exits. You can still run multiple processes in a container, but the command you give to docker is the main process that has a `pid` of `1`.
+  So this is going to run the command ~echo "hello, world"~ in a container based off of the Alpine image. Alpine is just a light-weight linux distribution.
+
+  You should see the following output when this is run:
+  #+BEGIN_QUOTE
+  Unable to find image 'alpine:latest' locally
+  latest: Pulling from library/alpine
+  4fe2ade4980c: Already exists
+  Digest: sha256:621c2f39f8133acb8e64023a94dbdf0d5ca81896102b9e57c0dc184cadaf5528
+  Status: Downloaded newer image for alpine:latest
+  hello, world
+  #+END_QUOTE
+
+  Docker does a few things when you try and run a container.
+  1. First it will look on your system for the image that you specified.
+  2. If it cannot be found, it will check [[https://hub.docker.com/][Docker Hub]], a repository of Docker images and pull it down.
+  3. Once the image is located and installed to your host, Docker starts the container and runs the specified command.
+  4. When the command has exited, the container will stop.
+
+** Deleting Containers
+   Run ~docker ps -a~ and you should see something like the following:
+   #+BEGIN_QUOTE
+   CONTAINER ID        IMAGE               COMMAND                 CREATED             STATUS                     PORTS               NAMES
+   bd995289303e        alpine:latest       "echo 'hello, world'"   3 seconds ago       Exited (0) 2 seconds ago                       gracious_ritchie
+   #+END_QUOTE
+   In the output we can see the container that we ran with ~docker run~. ~docker ps~ shows you all running containers. ~docker ps -a~ shows you all of the containers on your system, regardless of it's status.
+
+   So this container is just sitting on our system taking up space. Let's delete it. First off, grab the id of the container. This is shown in the ~docker ps -a~ command we just ran, which in my case is ~bd995289303e~. Then, we just pass that in to ~docker rm~:
+   #+BEGIN_SRC bash
+   docker rm bd995289303e
+   #+END_SRC
+
+   Now if we run ~docker ps -a~ again, we should see an empty list of containers:
+   #+BEGIN_QUOTE
+   CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+   #+END_QUOTE
+
+** Automatically Delete Containers
+   We don't have to do this song-and-dance every time we want to delete a container, though. We can simply tell docker to destroy the container when it is done running by passing in ~--rm~ to our run command. Let's run the ~docker run~ command we ran before, but here we'll pass in the ~--rm~ flag.
+   #+BEGIN_SRC bash
+   docker run --rm alpine:latest echo "hello world"
+   #+END_SRC
+
+   Now if we run ~docker ps -a~ we will not see that container in the list.
 
 ** Footnotes
 1. Alpine is a lightweight Linux distro used commonly in Linux containers for its' small image size and focus on security.
 
 ** Takeaways
-- Run containers with the `docker run` command.
+- Run containers with the ~docker run~ command.
+- View running containers with ~docker ps~ and all containers with ~docker ps -a~.
 - Containers are instances of container images.
 - The container will stop when the main process ends.
 
 * Open a Shell in a Container
-  Sometimes you will want to try something in a container before putting it into a ~Dockerfile~. You can do this by using the ~i~ and ~t~ options. These options give you an interactive shell. Try running the following and play around with it
+  In the previous example we just had the command ~echo "hello, world"~ run in a container. What if we wanted to inspect the container? Hop around the file system and see what's there? Let's try to open an ~sh~ shell in our Alpine container.
   #+BEGIN_SRC bash
-  docker run --rm -it alpine:latest sh
+  docker run --rm alpine:latest sh
   #+END_SRC
+
+  This should exit immediately and we'll still be on our host terminal. This is because Docker does not run commands in an interactive terminal by default. To do this we must provide the ~-i~ and ~-t~ options -- or ~--interactive~ and ~--tty~ respectively. Let's try it again with those options:
+  #+BEGIN_QUOTE
+  % docker run --rm -it alpine:latest sh
+  / # whoami
+  root
+  / # ls /home/
+  / # hostname
+  068aac782f39
+  / #
+  #+END_QUOTE
+
+  Now we have an interactive shell in our container. We can inspect it like I did in the example above and see that it doesn't look like our host. Remember back to the first section -- containers are /isolated/ environments.
 
 ** Takeaways
    - Pass `-it` to `docker run` to run the command in an interactive terminal.
