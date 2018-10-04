@@ -1,0 +1,79 @@
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers][Managing State in Containers]]
+
+* A More Realistic Dockerfile
+  Normally you won't generate your code through bash commands in a Dockerfile like we did in the previous section. Let's model a more realistic workflow. In this branch you have two files: ~Dockerfile~, which we'll be using to build our image, and ~index.html~, our source file that we will build our image with.
+
+  Our new ~Dockerfile~ is much smaller than before since we don't have any dependencies that aren't already included in our base image, ~python:3.6~.
+  #+BEGIN_SRC dockerfile
+FROM python:3.6
+
+WORKDIR /src
+
+COPY index.html .
+
+CMD python -m http.server
+  #+END_SRC
+  Here we have two new instructions: ~WORKDIR~, and ~COPY~.
+
+** WORKDIR
+   The ~WORKDIR~ instruction simply sets the current working directory to whatever you set it to, and will create it if it does not exist. This means that subsequent instructions in the ~Dockerfile~ will be executed from the directory you specified in the ~WORKDIR~ instruction.
+
+** COPY
+   This instruction copies code from your host machine in the Docker build context to the specified location in the image.
+
+** Stepping Through the Dockerfile
+   So from the top
+   1. Our ~FROM~ instruction tells Docker that we want to build on top of the ~python:3.6~ image.
+   2. We set our working directory to ~/src~ via the ~WORKDIR~ instruction.
+   3. We copy the file called ~index.html~ on our host in the Docker build context to our current working directory, ~/src~.
+   4. The default command for the image gets set to ~python -m http.server~.
+
+** Building Our Image
+   Like before, we must build our image
+   #+BEGIN_SRC bash
+   docker build -t myserv .
+   #+END_SRC
+   Last time we glossed over the build context, but we'll go over that now. Our last argument in the docker run command is our build context, in this case it is ~.~, which is our current working directory on our host. This tells Docker what directory to pull files from when building an image. So the ~COPY~ instruction in our ~Dockerfile~ is pulling the ~index.html~ file from our build context, which in this case is our current working directory on our host. Let's see if that worked.
+
+   After building the image, let's run a container using that image and open a ~bash~ shell.
+   #+BEGIN_SRC bash
+   docker run --rm -it myserv bash
+   #+END_SRC
+
+   When you have a shell open in your container, check your current working directory with the ~pwd~ command
+   #+BEGIN_EXAMPLE
+   root@ff5089e07bb1:/src# pwd
+   /src
+   #+END_EXAMPLE
+   We can see that our current working directory is ~/src~, which is what we set it to with the ~WORKDIR~ instruction. The ~COPY~ instruction should have copied ~index.html~ from the build context on our host to ~/src~ in the container. Let's see if that happened.
+   #+BEGIN_EXAMPLE
+   root@ff5089e07bb1:/src# cat index.html 
+   Moo
+   #+END_EXAMPLE
+   And it did! From here, let's run a container using the image we just built and go to http://localhost:8000 in a browser. Don't forget to exit your container shell with the ~exit~ command.
+   #+BEGIN_SRC bash
+   cid=$(docker run --rm -d -p "8000:8000" myserv)
+   #+END_SRC
+   After you view http://localhost:8000, kill the container
+   #+BEGIN_SRC bash
+   docker rm -f $cid
+   #+END_SRC
+
+** Takeaways
+   - You can use the ~WORKDIR~ instruction to set the working directory in your image and container.
+   - The ~COPY~ instruction copies files from your host in the Docker build context to a location in the image.
+
+
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers][Managing State in Containers]]
+
+* Mounting Files to a Running Container
+  So it's cool that we can build software from code on our hosts in our container, but we can also take advantage of tools and frameworks with auto-reload capabilities by mounting our files to a location in the container. We don't even have to change our ~Dockerfile~. Just run the following command:
+  #+BEGIN_SRC bash
+  docker run --rm -d -p "8000:8000" -v $(pwd):/src myserv
+  #+END_SRC
+  ~-v~ is short for ~--volume~ and mounts a file or directory on your host to a location in your container. After you run the command above, go to http://localhost:8000, edit the ~index.html~ file on your host, and reload the page. You should see the page updated with your changes, even though the process is running in the container.
+
+** Takeaways
+   - Use the ~-v~ option in ~docker run~ to mount a file or directory on your host to a location in the container.
+
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/03-docker-images][Docker Images]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers][Managing State in Containers]]
