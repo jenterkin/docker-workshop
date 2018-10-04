@@ -1,0 +1,91 @@
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/04-a-more-realistic-dockerfile][A More Realistic Dockerfile]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/06-docker-compose][Docker Compose]]
+
+* Managing State with Containers
+  One thing that has been glossed over so far is how containers deal with state. And by default, they don't. Let's see what I mean by this. Let's run an alpine container, create a file, make sure it exists, and exit the container.
+  #+BEGIN_EXAMPLE
+  % docker run --rm -it alpine sh
+  / # echo "hello" >> file
+  / # cat file 
+  hello
+  / # exit
+  #+END_EXAMPLE
+  Okay, so we made a file. Let's run an alpine container again and cat that file
+  #+BEGIN_EXAMPLE
+  % docker run --rm -it alpine sh
+  / # cat file
+  cat: can't open 'file': No such file or directory
+  #+END_EXAMPLE
+  As we can see, the file doesn't exist. This is because docker will create a new container every time you call ~docker run~. So how do we handle state with containers?
+
+** Data Volumes
+   Similarly to the mounted volumes we saw in the previous section, we can leverage data volumes. These are named volumes that are created outside of your project directory. You can create a data volume with the following command:
+   #+BEGIN_SRC bash
+   docker volume create myvolume
+   #+END_SRC
+
+   And you can list volumes with ~docker volume ls~
+   #+BEGIN_EXAMPLE
+   % docker volume ls
+   DRIVER              VOLUME NAME
+   local               myvolume
+   #+END_EXAMPLE
+
+   Let's go ahead and delete the volume we just created
+   #+BEGIN_SRC bash
+   docker volume rm myvolume
+   #+END_SRC
+
+*** Takeaways
+    - Create data volumes with ~docker volume create <volume name>~
+    - List data volumes with ~docker volume ls~
+    - Delete data volumes with ~docker volume rm <volume name>~
+
+** Storing Database Data to a Data Volume
+   We'll use postgres here, but it's not important for you to know how to use it.
+
+   First, we'll create a data volume for our postgres data
+   #+BEGIN_SRC bash
+   docker volume create pgdata
+   #+END_SRC
+
+   Then we'll run a postgres container and mount the data volume to it.
+   #+BEGIN_SRC bash
+   cid=$(docker run --rm -e POSTGRES_PASSWORD=supersecret -e POSTGRES_USER=docker -d -v pgdata:/var/lib/postgresql/data postgres:10.1)
+   #+END_SRC
+   The ~-e~ option here is new. It simply set's environment variables in the container. The postgres image we're using does some fancy things with environment variables, so we can set certain information for the db, like the username and password, through environment variables at runtime.
+
+   The container is now running, but we need to open an interactive shell. This is where ~docker exec~ comes in. ~docker exec~ allows us to run commands against a running container. Since we have the container id of the postgres container, we can simply run the following to create a database:
+   #+BEGIN_EXAMPLE
+   % docker exec $cid psql -U docker -c "create database test"
+   CREATE DATABASE
+   #+END_EXAMPLE
+
+   Now that the database has been created, let's destroy our container and start another one. Remember, we have the container id stored in ~$cid~.
+   #+BEGIN_SRC bash
+   docker stop $cid
+   cid=$(docker run --rm -e POSTGRES_PASSWORD=supersecret -e POSTGRES_USER=docker -d -v pgdata:/var/lib/postgresql/data postgres:10.1)
+   #+END_SRC
+
+   Now let's list the databases in postgres and see if we still have our ~test~ database
+   #+BEGIN_EXAMPLE
+   % docker exec $cid psql -U docker -c "\l"
+                                    List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ docker    | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ test      | docker   | UTF8     | en_US.utf8 | en_US.utf8 | 
+(5 rows)
+   #+END_EXAMPLE
+   And it's there!
+
+   Data volumes are great when you want persistent data during development, or if you want to store various datasets to use with a container. Data volumes can also be attached to any container, even at the same time.
+
+*** Takeaways
+    - Mount data volumes with the ~-v <volume name>:<location in container>~ option in a ~docker run~ command.
+
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/04-a-more-realistic-dockerfile][A More Realistic Dockerfile]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/06-docker-compose][Docker Compose]]
