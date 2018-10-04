@@ -1,0 +1,133 @@
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-cowserve-2.0][cowserve 2.0]]
+
+* Docker Images
+  As mentioned in the last section, containers are isolated environments and Docker images are pre-made containers. This is where all the fun configuration comes in.
+
+** Writing a Dockerfile
+   In the previous section we just used an image we got from Docker Hub, but we can also create our own images. Let's create an image that, when run, runs a webserver. To do this we need to create a ~Dockerfile~. Create a directory in your home directory called ~docker-workshop~, and in that directory create a file called ~Dockerfile~ and populate it with the following:
+   #+BEGIN_SRC dockerfile
+FROM python:3.6
+
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y clean
+RUN apt-get -y install cowsay fortune
+
+ENV PATH=$PATH:/usr/games
+RUN echo '<pre>' > index.html && \
+    cowsay $(fortune) >> index.html && \
+    echo '</pre>'
+
+CMD python -m http.server
+   #+END_SRC
+
+   What we have here is a ~Dockerfile~. It is comprised of instructions for creating a Docker image. When we build it, Docker will go sequentially through the file and create an image based on each instruction. Here we have four kinds of instructions:
+   - ~FROM~: Indicates the base image. This allows us to choose a starting place for our image so we don't have to build it completely from scratch.
+   - ~RUN~: Runs a command to configure the image. In this case we use run to install dependencies and generate an html file that exists in the container.
+   - ~ENV~: Sets an environment variable. This variable is available to all instructions after it is declared, and also to any process run in the container.
+   - ~CMD~: The default command run in a container. So far we have specified the command in ~docker run~, but we can also run it without specifying a command, and Docker will run it with the default command specified in the ~Dockerfile~.
+
+*** Takeaways
+    - Images are defined in `Dockerfile`s that should be named `Dockerfile` by default.
+    - `FROM` indicates that the image is based on another image.
+    - `RUN` runs a command and creates an image layer.
+    - `ENV` creates sets an environment variable.
+    - `CMD` sets the default command to run when a container of the image is run.
+
+** Building an Image
+   A Dockerfile is only a file composed of instructions to build an image. We now need to tell Docker to build an image based off of the file. Run the following command:
+   #+BEGIN_SRC bash
+   docker build -t cowserv .
+   #+END_SRC
+   ~docker build~ tells Docker that we want to build an image
+   ~-t cowserv~ is the name we want to tag our image with
+   ~.~ -- In bash, ~.~ is your current working directory. This is the build context that we want to give to Docker. We'll go into build context later.
+
+   Here Docker is going to start from the top. So let's dig in to what it is doing.
+
+   Each instruction we provide in a ~Dockerfile~ creates an image layer, which represents a change in an image. So our first ~RUN~ instruction is a layer that represents the change from the previous layer to our current layer where the instruction has been applied. We'll come back to this in a bit.
+
+   Our first instruction is ~FROM python:3.6~. This is saying that we want to build on top of the ~python:3.6~ image. This means that we will have everything from that image available in our own.
+
+   We then update our system packages with a ~RUN~ instruction, followed by another ~RUN~ instruction where we install our dependencies ~cowsay~ and ~fortune~.
+
+   After that we specify an ~ENV~ instruction. Docker will update our path environment to include ~/usr/games~ so our new dependencies will be in our system path.
+
+   Docker then looks at the ~RUN~ command after it and generates a file called ~index.html~. We did not specify a working directory, so this will exist in the ~/~ directory. Remember, this is an isolated environment, so the file exists in the container, not on your host.
+
+   After that, we specify the default command. Docker just stores this as metadata for the image, and no layer is created since there was not a change to the image itself.
+
+   The ~docker build~ command will have a lot of output -- much of it being the bash output from our ~RUN~ instructions. Run the command again and it will take much less time, and the output will be much shorter:
+   #+BEGIN_EXAMPLE
+   Step 1/6 : FROM python:3.6
+    ---> 4f13b7f2138e
+   Step 2/6 : ENV PATH=$PATH:/usr/games
+    ---> Using cache
+    ---> 2dafe9ff3ff8
+   Step 3/6 : RUN apt-get -y update &&     apt-get -y upgrade &&     apt-get -y clean
+    ---> Using cache
+    ---> abecd0c9cf7f
+   Step 4/6 : RUN apt-get -y install cowsay fortune
+    ---> Using cache
+    ---> 10a73259d8ac
+   Step 5/6 : RUN echo '<pre>' > index.html &&     cowsay $(fortune) >> index.html &&     echo '</pre>'
+    ---> Using cache
+    ---> 08e5ba939e65
+   Step 6/6 : CMD python -m http.server
+    ---> Using cache
+    ---> 3ac1918d4a7b
+   Successfully built 3ac1918d4a7b
+   Successfully tagged cowserv:latest
+   #+END_EXAMPLE
+   Notice how we see the phrase ~Using cache~ for each layer? That's because Docker saw that there were no changes, so there was no reason to run the commands again. If we were to change the fourth instruction, only the fourth and subsequent layers would be rebuilt.
+
+*** Takeaways
+    - Use ~docker build~ to build images from a ~Dockerfile~
+    - Docker caches each instruction in a ~layer~.
+    - Layers are not rebuilt unless there's a reason - e.g. an instruction was changed.
+
+** Running our image
+   Now that our image is build, let's run it with the following command:
+   #+BEGIN_SRC bash
+   docker run -d -p "8000:8000" cowserv:latest
+   #+END_SRC
+   Let's break this down:
+   ~docker run~, like before, says we're going to run a container
+   ~-d~ Tells Docker to run the container in the backrground
+   ~-p "8000:8000"~ is how we specify ports. This tells Docker to map port 8000 on our host to 8000 in the container. Otherwise, we won't be able to connect to the webserver from our host.
+   ~cowserv:latest~ Here we're telling docker that we want to run a container using the image we just built.
+
+   Now we can go to a browser on our host and go to http://localhost:8000 and see a response from our web server.
+   #+BEGIN_EXAMPLE
+    __________________________________
+   < Someone is speaking well of you. >
+    ----------------------------------
+	   \   ^__^
+	    \  (oo)\_______
+	       (__)\       )\/\
+		   ||----w |
+		   ||     ||
+   #+END_EXAMPLE
+   Now let's kill the container. Since we started the container with the ~-d~ option and our container process is still running, we have to stop the container manually. To do that we need the id. Get that from ~docker ps~ and pass it into ~docker stop~ and ~docker rm~. My id for the container was ~d922b45fe249~, so my commands would look like this:
+   #+BEGIN_EXAMPLE
+   docker stop d922b45fe249
+   docker rm d922b45fe249
+   #+END_EXAMPLE
+
+   This is kind of tedious, and there is a better way to hold on to a container id. Let's run our ~docker run~ command, but add a little more to it:
+   #+BEGIN_SRC bash
+    cid=$(docker run -d -p "8000:8000" cowserv:latest)
+   #+END_SRC
+
+   When you pass ~-d~ to ~docker run~, the command returns the container id, so we can assign that to a variable. This way we don't have to use ~docker ps~ to get the id and can instead do the following:
+   #+BEGIN_SRC bash
+    docker stop $cid && docker rm $cid
+   #+END_SRC
+
+*** Takeaways
+    - ~-d~ Passing ~-d~ to ~docker run~ tells Docker to run the container in the background.
+    - Passing the ~-p~ option with a port range to ~docker run~ tells docker how to map ports from the host to the container.
+    - Passing ~-d~ to ~docker run~ will return the container id.
+
+
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-cowserve-2.0][cowserve 2.0]]
