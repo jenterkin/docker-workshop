@@ -55,7 +55,7 @@ CMD python -m http.server
 
    Docker then looks at the ~RUN~ command after it and generates a file called ~index.html~. We did not specify a working directory, so this will exist in the ~/~ directory. Remember, this is an isolated environment, so the file exists in the container, not on your host.
 
-   After that, we specify the default command. Docker just stores this as metadata for the image, and no layer is created since there was not a change to the image itself.
+   After that, we specify the default command. Docker just stores this as metadata for the image.
 
    The ~docker build~ command will have a lot of output -- much of it being the bash output from our ~RUN~ instructions. Run the command again and it will take much less time, and the output will be much shorter:
    #+BEGIN_EXAMPLE
