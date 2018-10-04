@@ -1,4 +1,4 @@
-Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-cowserve-2.0][cowserve 2.0]]
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-a-more-realistic-dockerfile][A More Realistic Dockerfile]]
 
 * Docker Images
   As mentioned in the last section, containers are isolated environments and Docker images are pre-made containers. This is where all the fun configuration comes in.
@@ -130,4 +130,4 @@ CMD python -m http.server
     - Passing ~-d~ to ~docker run~ will return the container id.
 
 
-Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-cowserve-2.0][cowserve 2.0]]
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/02-running-a-docker-container][Running a Docker Container]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/04-a-more-realistic-dockerfile][A More Realistic Dockerfile]]
