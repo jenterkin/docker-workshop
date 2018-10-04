@@ -1,0 +1,87 @@
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers][Managing State in Containers]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/07-monolith-to-microservices][Converting a Monolith to MIcroservices]]
+
+* Docker Compose
+  Docker Compose is a great tool to use during development. It makes it easy to manage and configure mulitple containers, while making it easy to set up communication between them.
+
+  This branch has three files
+  - ~docker-compose.yml~: A yaml file where you configure what containers you want to run and how they are configured.
+  - ~Dockerfile~: A Dockerfile we used previously.
+  - ~index.html~: A file used to build the image
+
+** The Docker Compose File
+   The ~docker-compose.yml~ file looks like this:
+   #+BEGIN_SRC yaml
+version: '3'
+services:
+  myserv:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ".:/src"
+   #+END_SRC
+   The top-level items of this file indicate the Docker Compose version, and a map of the services you are configuring. In this case we are configuring a single service, or container, called myserv. We are configuring ~myserv~ to be built from the current directory, mapping port 8000 on our host to 8000 in the container, and mounting the directory the Compose file is in to ~/src~ in the container.
+
+** Using Docker Compose
+   Currently, this is effectively the same as the command we used to run this container back in the "A More Realistic Dockerfile" section, which looked like this:
+   #+BEGIN_SRC bash
+   docker run -d -p "8000:8000" -v "$(pwd):/src" cowserv
+   #+END_SRC
+   But you don't have to remember these configs, just run:
+   #+BEGIN_EXAMPLE
+   % docker-compose up -d
+   Starting docker-microservice-example_myserv_1 ... done
+   #+END_EXAMPLE
+
+   What happens here is that Docker Compose will look for a file in your current working directory called ~docker-compose.yml~ and start all the services it finds in the file, configured the way you specified. If the images haven't been built yet, they will be built. However, it is a good idea to run ~docker-compose up --build -d~ to explicity have the images built. If the images exist on your host, Docker Compose will not check to see if they need to be rebuilt.
+
+   Now that the container is running, run ~docker-compose ps~
+   #+BEGIN_EXAMPLE
+                   Name                              Command               State           Ports         
+------------------------------------------------------------------------------------------------------
+docker-microservice-example_myserv_1   /bin/sh -c python -m http. ...   Up      0.0.0.0:8000->8000/tcp
+   #+END_EXAMPLE
+   This will show you all containers configured in the file, along with their name, the command used to run, their state, and the exposed ports.
+
+   You also do not need the container ids to manage the containers. You can simply do that by the service name defined in the yaml file.
+   #+BEGIN_EXAMPLE
+   % docker-compose stop myserv && docker-compose rm -f myserv
+   Stopping docker-microservice-example_myserv_1 ... done
+   Going to remove docker-microservice-example_myserv_1
+   Removing docker-microservice-example_myserv_1 ... done
+   #+END_EXAMPLE
+
+** Container Networking
+   By default, all containers are on a virtual network and can communicate with each other. This network is not reachable from your host unless you expose ports to services in your compose file. Let's test this out by adding another service to the compose file. Add this snippet to the end of ~docker-compose.yml~
+   #+BEGIN_SRC yaml
+  test:
+    image: alpine
+   #+END_SRC
+   Our Compose file should now look like this:
+   #+BEGIN_SRC yaml
+version: '3'
+services:
+  myserv:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ".:/src"
+  test:
+    image: alpine
+   #+END_SRC
+   Run ~docker-compose up~ again. Docker Compose will again read the file, and perform any operations to configure containers to match what is defined in the file. In this case it will bring up a new image with the name of "test" based off of the Alpine image.
+   Now that we have two containers in the Docker Compose network, let's open an interactive shell on the ~test~ container.
+   #+BEGIN_SRC bash
+   docker-compose run test sh
+   #+END_SRC
+   We do not have to specify the ~-i~ and ~-t~ options with Compose. Compose assumes that if you are manually specifying a command, you want to run it in an interactive terminal.
+
+   Now that we are in the ~test~ container, let's see if we can get a response from the ~myserv~ container. By default, Docker Compose sets the hostname on the internal DNS to the service name provided in the Docker Compose file. ~curl~ is not available in Alpine without installing it, so let's run the following ~wget~ command:
+   #+BEGIN_SRC bash
+   wget -qO- myserv:8000
+   #+END_SRC
+
+   This should print ~Moo~ to stdout.
+
+Previous: [[https://github.com/jenterkin/docker-microservice-example/tree/05-managing-state-in-containers][Managing State in Containers]] | Next: [[https://github.com/jenterkin/docker-microservice-example/tree/07-monolith-to-microservices][Converting a Monolith to MIcroservices]]
